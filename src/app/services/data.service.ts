@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { BehaviorSubject, Observable } from "rxjs";
 import { LoaderService } from "./loader.service";
-import { User } from "../user.model";
+import { User } from "../models/user.model";
 
 @Injectable({
   providedIn: 'root'
