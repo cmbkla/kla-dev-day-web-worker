@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -11,6 +12,7 @@ import {
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
+import { Observable } from "rxjs";
 import { User } from "../../models/user.model";
 
 @Component({
@@ -19,7 +21,7 @@ import { User } from "../../models/user.model";
   styleUrls: ['./data-table.component.scss']
 })
 export class DataTableComponent implements AfterViewInit, OnChanges  {
-  @Input() public data: User[] | null = [];
+  @Input() public data: Observable<User[]>;
 
   @Output() public filter: EventEmitter<string> = new EventEmitter<string>();
   @Output() public delete: EventEmitter<number> = new EventEmitter<number>();
@@ -28,6 +30,10 @@ export class DataTableComponent implements AfterViewInit, OnChanges  {
   public dataSource = new MatTableDataSource<User>([]);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+
+  constructor(
+    protected changeDetectorRef: ChangeDetectorRef,
+  ){}
 
   public ngAfterViewInit(): void {
     if (!!this.dataSource) {
@@ -38,11 +44,14 @@ export class DataTableComponent implements AfterViewInit, OnChanges  {
 
   public ngOnChanges(changes: SimpleChanges) {
     if (Object.keys(changes).includes("data") && !!this.data) {
-      if (this.dataSource.data !== this.data) {
-        this.dataSource.data = this.data;
-      }
-    } else {
-      this.dataSource.data = [];
+      this.data.subscribe(data => {
+        if (this.dataSource.data !== data) {
+          this.dataSource.data = data;
+        } else {
+          this.dataSource.data = [];
+        }
+        this.changeDetectorRef.detectChanges();
+      });
     }
   }
 

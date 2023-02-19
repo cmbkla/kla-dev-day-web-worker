@@ -24,22 +24,25 @@ export class DataService {
   public load(size: "small" | "medium" | "large" | "excessive"): void {
     this.loaderService.loadingState(true);
 
+    const finalizeLoad = (dataToSet: User[]) => {
+      this.setLoadedData(dataToSet);
+
+      this.loaderService.loadingState(false);
+    };
+
     this.httpClient.get(`/assets/${size}-data.json`).subscribe({
       next: data => {
         if (!data) {
-          this.setLoadedData([]);
-          this.loaderService.loadingState(false);
           this.showError("Application Error: failed to load data");
+          finalizeLoad([]);
           return;
         }
 
-        this.setLoadedData(data as User[]);
-        this.loaderService.loadingState(false);
-        this.showError("Loaded data");
+        finalizeLoad(data as User[]);
+        this.showSuccess("Loaded data");
       },
       error: () => {
-        this.setLoadedData([]);
-        this.loaderService.loadingState(false);
+        finalizeLoad([]);
         this.showSuccess("Application Error: failed to load data");
       }
     });
@@ -47,11 +50,16 @@ export class DataService {
 
   public filter(filter: string): void {
     this.lastFilter = filter;
-    this.dataSubject.next(this.loadedData.filter(row =>
+    if (this.lastFilter?.length < 1) {
+      this.dataSubject.next(Array.from(this.loadedData));
+      return;
+    }
+
+    this.dataSubject.next(Array.from(this.loadedData.filter(row =>
       `${row.firstName}|${row.lastName}|${row.email}|${row.ipAddress}|${row.firstName} ${row.lastName}`
         .toLowerCase()
         .includes(filter.toLowerCase())
-    ));
+    )));
   }
 
   public delete(itemId: number): void {
@@ -85,7 +93,7 @@ export class DataService {
 
   protected setLoadedData(data: User[]): void {
     this.loadedData = data;
-    this.dataSubject.next(this.loadedData);
+    this.filter(this.lastFilter);
   }
 
   protected showSuccess(message: string): void {

@@ -19,6 +19,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
+import { CrossTabRelayService } from "./services/cross-tab-relay.service";
 
 @NgModule({
   declarations: [
@@ -47,7 +48,9 @@ import { MainNavComponent } from './components/main-nav/main-nav.component';
 		MatProgressBarModule,
     MatSnackBarModule,
 	],
-  providers: [],
+  providers: [
+    CrossTabRelayService
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule { }
