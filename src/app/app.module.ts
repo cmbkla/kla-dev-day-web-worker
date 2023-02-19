@@ -17,8 +17,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { DataTableComponent } from './data-table/data-table.component';
-import { MainNavComponent } from './main-nav/main-nav.component';
+import { DataTableComponent } from './components/data-table/data-table.component';
+import { MainNavComponent } from './components/main-nav/main-nav.component';
 
 @NgModule({
   declarations: [

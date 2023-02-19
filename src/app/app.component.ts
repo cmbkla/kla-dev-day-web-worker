@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { DataService } from "./data.service";
-import { LoaderService } from "./loader.service";
+import { DataService } from "./services/data.service";
+import { LoaderService } from "./services/loader.service";
 
 @Component({
   selector: 'app-root',
