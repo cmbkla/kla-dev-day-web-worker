@@ -1,14 +1,18 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, filter, Observable, Subscription } from "rxjs";
+import { CrossTabRelayService } from "./cross-tab-relay.service";
 import { LoaderService } from "./loader.service";
 import { User } from "../models/user.model";
 
 @Injectable({
   providedIn: 'root'
 })
-export class DataService {
+export class DataService implements OnDestroy {
+  protected readonly relayKey: string = "application-data-service";
+  protected subscriptions: Subscription = new Subscription();
+
   protected dataSubject: BehaviorSubject<any> = new BehaviorSubject<User[]>([]);
   public dataObservable: Observable<User[]> = this.dataSubject.asObservable();
   protected loadedData: User[] = [];
@@ -17,8 +21,23 @@ export class DataService {
   constructor(
     public httpClient: HttpClient,
     public loaderService: LoaderService,
-    protected snackBar: MatSnackBar
+    protected snackBar: MatSnackBar,
+    protected crossTabRelayService: CrossTabRelayService,
   ) {
+    this.subscriptions.add(this.crossTabRelayService.relayStream.pipe(
+      filter(x => x.type === this.relayKey)
+    ).subscribe(message => {
+      if (!Array.isArray(message?.payload)) {
+        this.setLoadedData([]);
+        return;
+      }
+
+      this.setLoadedData(message.payload as User[]);
+    }));
+  }
+
+  public ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 
   public load(size: "small" | "medium" | "large" | "excessive"): void {
@@ -26,7 +45,7 @@ export class DataService {
 
     const finalizeLoad = (dataToSet: User[]) => {
       this.setLoadedData(dataToSet);
-
+      this.crossTabRelayService.relay(this.relayKey, dataToSet);
       this.loaderService.loadingState(false);
     };
 
