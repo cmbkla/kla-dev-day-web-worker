@@ -10,13 +10,16 @@ import { User } from "../models/user.model";
   providedIn: 'root'
 })
 export class DataService implements OnDestroy {
-  protected readonly relayKey: string = "application-data-service";
+  protected readonly dataRelayKey: string = "application-data-service-data";
+  protected readonly processRelayKey: string = "application-data-service-process";
   protected subscriptions: Subscription = new Subscription();
 
   protected dataSubject: BehaviorSubject<any> = new BehaviorSubject<User[]>([]);
   public dataObservable: Observable<User[]> = this.dataSubject.asObservable();
   protected loadedData: User[] = [];
   protected lastFilter: string = "";
+
+  protected processIsActive: boolean = false;
 
   constructor(
     public httpClient: HttpClient,
@@ -25,7 +28,7 @@ export class DataService implements OnDestroy {
     protected crossTabRelayService: CrossTabRelayService,
   ) {
     this.subscriptions.add(this.crossTabRelayService.relayStream.pipe(
-      filter(x => x.type === this.relayKey)
+      filter(x => x.type === this.dataRelayKey)
     ).subscribe(message => {
       if (!Array.isArray(message?.payload)) {
         this.setLoadedData([]);
@@ -33,6 +36,12 @@ export class DataService implements OnDestroy {
       }
 
       this.setLoadedData(message.payload as User[]);
+    }));
+
+    this.subscriptions.add(this.crossTabRelayService.relayStream.pipe(
+      filter(x => x.type === this.processRelayKey)
+    ).subscribe(message => {
+      this.processIsActive = message.payload;
     }));
   }
 
@@ -45,7 +54,7 @@ export class DataService implements OnDestroy {
 
     const finalizeLoad = (dataToSet: User[]) => {
       this.setLoadedData(dataToSet);
-      this.crossTabRelayService.relay(this.relayKey, dataToSet);
+      this.crossTabRelayService.relay(this.dataRelayKey, dataToSet);
       this.loaderService.loadingState(false);
     };
 
@@ -93,11 +102,16 @@ export class DataService implements OnDestroy {
       deleteIndex,
       1
     );
+    this.crossTabRelayService.relay(this.dataRelayKey, this.loadedData);
     this.filter(this.lastFilter);
     this.showSuccess(`Deleted  #${itemId}`);
   }
 
   public process(): void {
+    if (this.processIsActive) {
+      this.showError("Cannot start The Process: it is active already active on another tab.");
+      return;
+    }
     this.loaderService.loadingState(true);
 
     this.loadedData.forEach(r => {
