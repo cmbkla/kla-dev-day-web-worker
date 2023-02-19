@@ -1,0 +1,14 @@
+<main-nav
+  [ngClass]="{'loading': (loaderService.loadingObservable | async)}"
+>
+  <app-data-table
+    [data]="dataService.dataObservable | async"
+    (filter)="dataService.filter($event)"
+    (delete)="dataService.delete($event)"
+  ></app-data-table>
+</main-nav>
+
+
+<ng-container *ngIf="(loaderService.loadingObservable | async)">
+  <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+</ng-container>

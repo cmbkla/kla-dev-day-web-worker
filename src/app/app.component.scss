@@ -1,0 +1,14 @@
+mat-progress-bar {
+  position: fixed;
+  top: 0;
+}
+
+.loading {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+
+error-snackkbar {
+  background-color: red;
+}

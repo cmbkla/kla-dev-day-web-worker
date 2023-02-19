@@ -1,0 +1,21 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <span>KLA Dev Day - WebWorker Workshop</span>
+
+
+      <span class="spacer"></span>
+      The Process: <a class="pointer" (click)="doWork()">Do Work</a>
+
+      <span class="spacer"></span>
+      Load data:
+      <a class="pointer" (click)="loadData('small')">Small</a>
+      <a class="pointer" (click)="loadData('medium')">Medium</a>
+      <a class="pointer" (click)="loadData('large')">Large</a>
+      <a class="pointer" (click)="loadData('excessive')">Missing</a>
+    </mat-toolbar>
+
+    <ng-content></ng-content>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,78 @@
+<div class="mat-elevation-z8 data-table">
+
+  <p>
+    <mat-form-field appearance="fill">
+      <mat-label>Filter</mat-label>
+      <input (keyup)="doFilter($event)" matInput placeholder="Type text to search">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </p>
+
+  <mat-paginator
+    #paginator
+    [length]="dataSource.data.length"
+    [pageIndex]="0"
+    [pageSize]="50"
+    [pageSizeOptions]="[25, 50, 100, 250]"
+  >
+  </mat-paginator>
+
+  <table
+    mat-table
+    class="full-width-table"
+    [dataSource]="dataSource"
+    matSort
+    aria-label="Elements"
+  >
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by id">ID</th>
+      <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="firstName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by first name">First Name</th>
+      <td mat-cell *matCellDef="let row">{{ row.firstName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="lastName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by last name">Last Name</th>
+      <td mat-cell *matCellDef="let row">{{ row.lastName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by email address">Email Address</th>
+      <td mat-cell *matCellDef="let row">{{ row.email }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="ipAddress">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by ipAddress">IP Address</th>
+      <td mat-cell *matCellDef="let row">{{ row.ipAddress }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef>Action</th>
+      <td mat-cell *matCellDef="let row">
+        <mat-icon
+          (click)="deleteItem(row)"
+        >
+          delete
+        </mat-icon>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+    ></tr>
+  </table>
+
+  <mat-paginator
+    #paginator
+    [length]="dataSource.data.length"
+    [pageIndex]="0"
+    [pageSize]="50"
+    [pageSizeOptions]="[25, 50, 100, 250]"
+  >
+  </mat-paginator>
+</div>
