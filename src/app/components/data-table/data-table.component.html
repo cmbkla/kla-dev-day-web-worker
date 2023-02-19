@@ -67,6 +67,11 @@
     ></tr>
   </table>
 
+  <div
+    *ngIf="!dataSource?.data || dataSource?.data?.length === 0"
+    class="nothing-found"
+  >Nothing found: there are no records to list</div>
+
   <mat-paginator
     #paginator
     [length]="dataSource.data.length"
