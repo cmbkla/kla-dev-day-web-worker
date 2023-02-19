@@ -8,8 +8,6 @@ import { LoaderService } from "./services/loader.service";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'kla-dev-day-web-worker';
-
   constructor(
     public dataService: DataService,
     public loaderService: LoaderService,

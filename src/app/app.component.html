@@ -2,7 +2,7 @@
   [ngClass]="{'loading': (loaderService.loadingObservable | async)}"
 >
   <app-data-table
-    [data]="dataService.dataObservable | async"
+    [data]="dataService.dataObservable"
     (filter)="dataService.filter($event)"
     (delete)="dataService.delete($event)"
   ></app-data-table>
