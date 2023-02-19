@@ -27,20 +27,18 @@ export class DataService {
     this.httpClient.get(`/assets/${size}-data.json`).subscribe({
       next: data => {
         if (!data) {
-          this.loadedData = [];
-          this.dataSubject.next(this.loadedData);
+          this.setLoadedData([]);
           this.loaderService.loadingState(false);
           this.showError("Application Error: failed to load data");
           return;
         }
-        this.loadedData = (<User[]>data).map(d => d as User);
-        this.dataSubject.next(this.loadedData);
+
+        this.setLoadedData(data as User[]);
         this.loaderService.loadingState(false);
         this.showError("Loaded data");
       },
       error: () => {
-        this.loadedData = [];
-        this.dataSubject.next(this.loadedData);
+        this.setLoadedData([]);
         this.loaderService.loadingState(false);
         this.showSuccess("Application Error: failed to load data");
       }
@@ -83,6 +81,11 @@ export class DataService {
 
     this.loaderService.loadingState(false);
     this.showSuccess("Process complete");
+  }
+
+  protected setLoadedData(data: User[]): void {
+    this.loadedData = data;
+    this.dataSubject.next(this.loadedData);
   }
 
   protected showSuccess(message: string): void {
