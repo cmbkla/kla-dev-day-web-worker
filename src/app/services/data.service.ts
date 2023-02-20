@@ -93,6 +93,7 @@ export class DataService implements OnDestroy {
       deleteIndex,
       1
     );
+    this.crossTabRelayService.relay(this.relayKey, this.loadedData);
     this.filter(this.lastFilter);
     this.showSuccess(`Deleted  #${itemId}`);
   }
