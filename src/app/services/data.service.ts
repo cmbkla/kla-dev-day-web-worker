@@ -20,6 +20,7 @@ export class DataService implements OnDestroy {
   protected lastFilter: string = "";
 
   protected processIsActive: boolean = false;
+  protected worker: SharedWorker;
 
   constructor(
     public httpClient: HttpClient,
@@ -43,6 +44,23 @@ export class DataService implements OnDestroy {
     ).subscribe(message => {
       this.processIsActive = message.payload;
     }));
+
+    this.worker = new SharedWorker("assets/data-service-shared.worker.js");
+    this.worker.port.onmessage = (e) => {
+      switch (e.data) {
+        case "already":
+          this.showError("Application Error: The Process is already running.");
+          break;
+        case "done":
+          this.crossTabRelayService.relay(this.processRelayKey, false);
+          this.loaderService.loadingState(false);
+          this.showSuccess("Process complete");
+          break;
+        case "bad":
+          this.showError("Application Error: cannot run The Process, bad data.");
+          break;
+      }
+    };
   }
 
   public ngOnDestroy() {
@@ -112,16 +130,10 @@ export class DataService implements OnDestroy {
       this.showError("Cannot start The Process: it is active already active on another tab.");
       return;
     }
+    this.crossTabRelayService.relay(this.processRelayKey, true);
     this.loaderService.loadingState(true);
 
-    this.loadedData.forEach(r => {
-      for (let step = 0; step < 1000; step++) {
-        console.log(`${r.id}-${step}`);
-      }
-    });
-
-    this.loaderService.loadingState(false);
-    this.showSuccess("Process complete");
+    this.worker.port.postMessage(this.loadedData);
   }
 
   protected setLoadedData(data: User[]): void {
